@@ -21,9 +21,15 @@ const demoVmess = [
 ].join('\n');
 
 const demoIps = [
-  '104.16.1.2#HK-01',
-  '104.17.2.3#HK-02',
-  '104.18.3.4:2053#US-Edge'
+  '108.162.198.162#CN-Hangzhou-Telecom',
+  '162.159.45.98#CN-Hangzhou-Telecom',
+  '172.64.53.152#CN-Hangzhou-Telecom',
+  '104.20.26.90#CN-Hangzhou-Unicom',
+  '104.20.28.129#CN-Hangzhou-Unicom',
+  '104.20.16.179#CN-Hangzhou-Unicom',
+  '104.17.215.195#CN-Hangzhou-Mobile',
+  '104.17.218.30#CN-Hangzhou-Mobile',
+  '104.17.58.81#CN-Hangzhou-Mobile'
 ].join('\n');
 
 fillDemoBtn.addEventListener('click', () => {
