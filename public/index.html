@@ -6,7 +6,7 @@
     <title>Preferred IP Subscription Generator</title>
     <meta
       name="description"
-      content="Batch replace server addresses in your self-hosted vmess/vless/trojan nodes with preferred IPs, and export subscription links compatible with Clash, V2rayN, Shadowrocket, and Surge."
+      content="Replace server addresses in vmess/vless/trojan nodes with preferred IPs. Exports for Clash, V2rayN, Shadowrocket, Surge."
     />
     <link rel="icon" href="/icons/auto.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/styles.css" />
@@ -19,34 +19,34 @@
 
           <h1 class="hero-title">
             <img src="/icons/auto.svg" alt="logo" class="hero-logo" />
-            <span>Subscription Generator (China Supported)</span>
+            <span>Subscription Generator</span>
           </h1>
           <p class="lead">
-            Thank you for using ShadowEscaper's Subscription Generator! This tool is designed to help you easily replace the server addresses in your self-hosted vmess/vless/trojan nodes with your preferred IPs, and export subscription links compatible with Clash, V2rayN, Shadowrocket, Surge, and more. Please note that this tool is intended for users in China and may not work properly outside of China due to network restrictions.
+            Swap your vmess/vless/trojan server addresses for preferred IPs and export to Clash, V2rayN, Shadowrocket, and Surge. Optimized for users in China.
           </p>
         </div>
         <div class="hero-note">
-          <strong>What is this project?</strong>
-          <p>ShadowEscaper is a proxy service that helps you stay hidden on the internet and protects your online safety.</p>
+          <strong>About</strong>
+          <p>ShadowEscaper is a proxy service that keeps you private and safe online.</p>
         </div>
       </section>
 
       <section class="grid two-col">
         <form id="generator-form" class="card stack-lg">
           <div>
-            <label for="nodeLinks">1. Paste your original subscription link.</label>
+            <label for="nodeLinks">1. Original subscription link</label>
             <textarea
               id="nodeLinks"
               name="nodeLinks"
               rows="10"
-              placeholder="Supports vmess://, vless://, trojan://, one per line. Also supports directly pasting raw base64 subscription content."
+              placeholder="Supports vmess://, vless://, trojan:// (one per line) or raw base64 subscription content."
               required
             ></textarea>
-            <p class="hint">Mainly compatible with common WS + TLS formats of self-hosted VMess / VLESS / Trojan nodes.</p>
+            <p class="hint">Best with self-hosted VMess / VLESS / Trojan over WS + TLS.</p>
           </div>
 
           <div>
-            <label for="preferredIps">2. Paste your preferred IPs / domains.</label>
+            <label for="preferredIps">2. Preferred IPs / domains</label>
             <textarea
               id="preferredIps"
               name="preferredIps"
@@ -58,43 +58,42 @@ cf.example.com:443#US-Edge"
               required
             ></textarea>
             <p class="hint">
-              Supports <code>IP</code>, <code>IP:port</code>, <code>domain</code>, <code>domain:port</code>, with optional comments after <code>#</code>.
+              Accepts <code>IP</code>, <code>IP:port</code>, <code>domain</code>, <code>domain:port</code>. Add a label after <code>#</code>.
             </p>
           </div>
 
           <div class="grid two-col compact">
             <div>
-              <label for="namePrefix">3. Comment Prefix (Optional)</label>
+              <label for="namePrefix">3. Name prefix (optional)</label>
               <input id="namePrefix" name="namePrefix" type="text" placeholder="e.g., CF" />
             </div>
             <div class="checkbox-wrap">
               <input id="keepOriginalHost" name="keepOriginalHost" type="checkbox" checked />
-              <label for="keepOriginalHost">Keep Original Host / SNI (Recommended)</label>
+              <label for="keepOriginalHost">Keep original Host / SNI</label>
             </div>
           </div>
 
           <div class="actions">
-            <button id="submitBtn" type="submit">Generate Subscription</button>
-            <button id="fillDemoBtn" type="button" class="secondary">Fill Demo Data</button>
+            <button id="submitBtn" type="submit">Generate</button>
+            <button id="fillDemoBtn" type="button" class="secondary">Demo Data</button>
           </div>
         </form>
 
         <aside class="card stack-md tips">
           <h2>Notes</h2>
           <ul>
-            <li>This tool does not find preferred IPs for you — it only replaces existing nodes with the preferred IPs you provide.</li>
-            <li>The generated links contain the same node content in different export formats, each suited for different clients.</li>
-            <li>It's recommended to keep "Keep Original Host / SNI" enabled, especially for Cloudflare CDN scenarios.</li>
-            <li>Node information in subscription links is encrypted with a server-side key. Please do not share these links publicly.</li>
+            <li>Bring your own preferred IPs — this tool only swaps them in.</li>
+            <li>One node set, multiple export formats.</li>
+            <li>Keep "original Host / SNI" on for Cloudflare CDN.</li>
+            <li>Links are server-side encrypted. Don't share them publicly.</li>
           </ul>
 
           <div class="client-box">
-            <h3>How to Use with Clients</h3>
+            <h3>Which link to use</h3>
             <ul>
-              <li><strong>V2rayN:</strong> Use the raw subscription link</li>
-              <li><strong>Shadowrocket:</strong> Use the raw subscription link</li>
-              <li><strong>Clash / Mihomo:</strong> Use the Clash subscription link</li>
-              <li><strong>Surge:</strong> Use the Surge subscription link</li>
+              <li><strong>V2rayN / Shadowrocket:</strong> raw link</li>
+              <li><strong>Clash / Mihomo:</strong> Clash link</li>
+              <li><strong>Surge:</strong> Surge link</li>
             </ul>
           </div>
         </aside>
@@ -104,15 +103,15 @@ cf.example.com:443#US-Edge"
         <div class="section-head result-head">
           <div>
             <p class="eyebrow">Results</p>
-            <h2>Subscription Results</h2>
-            <p class="section-desc">Choose the format that matches your client, then copy the subscription link or scan the QR code to import.</p>
+            <h2>Subscriptions</h2>
+            <p class="section-desc">Copy the link or scan the QR code to import.</p>
           </div>
         </div>
 
         <div id="warningBox" class="warning hidden"></div>
 
         <div id="emptyState" class="empty-state">
-          No subscription generated yet. Please fill in the node links and preferred IPs, then click "Generate Subscription".
+          Nothing yet. Fill in the fields above and click Generate.
         </div>
 
         <div id="statsGrid" class="stats-grid">
@@ -139,7 +138,7 @@ cf.example.com:443#US-Edge"
                 </div>
                 <div>
                   <h3>Auto Detect</h3>
-                  <p>For clients that support automatic format detection</p>
+                  <p>For clients with auto-detection</p>
                 </div>
               </div>
             </div>
@@ -158,7 +157,7 @@ cf.example.com:443#US-Edge"
                 </div>
                 <div>
                   <h3>V2rayN</h3>
-                  <p>For V2rayN / v2rayNG</p>
+                  <p>V2rayN / v2rayNG</p>
                 </div>
               </div>
             </div>
@@ -177,7 +176,7 @@ cf.example.com:443#US-Edge"
                 </div>
                 <div>
                   <h3>Clash</h3>
-                  <p>For Clash / Mihomo / Clash Verge</p>
+                  <p>Clash / Mihomo / Clash Verge</p>
                 </div>
               </div>
             </div>
@@ -196,7 +195,7 @@ cf.example.com:443#US-Edge"
                 </div>
                 <div>
                   <h3>Shadowrocket</h3>
-                  <p>For iPhone / iPad Shadowrocket</p>
+                  <p>iPhone / iPad</p>
                 </div>
               </div>
             </div>
@@ -215,7 +214,7 @@ cf.example.com:443#US-Edge"
                 </div>
                 <div>
                   <h3>Surge</h3>
-                  <p>For Surge Profile import</p>
+                  <p>Surge Profile import</p>
                 </div>
               </div>
             </div>
@@ -224,12 +223,12 @@ cf.example.com:443#US-Edge"
               <button data-copy-target="surgeUrl" type="button" class="secondary small">Copy</button>
               <button data-qrcode-target="surgeUrl" type="button" class="secondary small">QR Code</button>
             </div>
-            <p class="hint">The current Surge export primarily supports VMess / Trojan; your sample VMess nodes are compatible.</p>
+            <p class="hint">Surge export supports VMess / Trojan only.</p>
           </article>
         </div>
 
         <div class="preview-wrap">
-          <h3>Preview of First 20 Generated Nodes</h3>
+          <h3>Preview (first 20 nodes)</h3>
           <div class="table-wrap">
             <table>
               <thead>
@@ -254,7 +253,7 @@ cf.example.com:443#US-Edge"
       <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="qrTitle">
         <div class="modal-head">
           <div>
-            <p class="eyebrow">QR Code Import</p>
+            <p class="eyebrow">QR Code</p>
             <h3 id="qrTitle">Subscription QR Code</h3>
           </div>
           <button id="closeQrModal" type="button" class="secondary small">Close</button>
@@ -265,7 +264,7 @@ cf.example.com:443#US-Edge"
         </div>
       </div>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script type="module" src="/app.js"></script>
   </body>
 </html>
