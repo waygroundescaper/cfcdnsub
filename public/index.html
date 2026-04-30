@@ -1,12 +1,12 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>优选IP订阅生成器</title>
+    <title>Preferred IP Subscription Generator</title>
     <meta
       name="description"
-      content="将自建 vmess/vless/trojan 节点批量替换为优选 IP，并导出 Clash、V2rayN、Shadowrocket、Surge 可用订阅链接。"
+      content="Batch replace server addresses in your self-hosted vmess/vless/trojan nodes with preferred IPs, and export subscription links compatible with Clash, V2rayN, Shadowrocket, and Surge."
     />
     <link rel="icon" href="/icons/auto.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/styles.css" />
@@ -15,86 +15,86 @@
     <main class="container">
       <section class="hero card">
         <div>
-          <p class="eyebrow">InfiCheesy &amp; YouTube &amp; GitHub</p>
+          <p class="eyebrow">ShadowEscaper</p>
 
           <h1 class="hero-title">
             <img src="/icons/auto.svg" alt="logo" class="hero-logo" />
-            <span>优选IP订阅生成器</span>
+            <span>Subscription Generator (China Supported)</span>
           </h1>
           <p class="lead">
-            只做三件事：导入自建节点、批量替换为优选 IP、输出可导入主流客户端的订阅链接。
+            Thank you for using ShadowEscaper's Subscription Generator! This tool is designed to help you easily replace the server addresses in your self-hosted vmess/vless/trojan nodes with your preferred IPs, and export subscription links compatible with Clash, V2rayN, Shadowrocket, Surge, and more. Please note that this tool is intended for users in China and may not work properly outside of China due to network restrictions.
           </p>
         </div>
         <div class="hero-note">
-          <strong>适合场景</strong>
-          <p>3X-UI / Xray / VPS 自建节点 + 你自己找好的 Cloudflare 优选 IP。</p>
+          <strong>What is this project?</strong>
+          <p>ShadowEscaper is a proxy service that helps you stay hidden on the internet and protects your online safety.</p>
         </div>
       </section>
 
       <section class="grid two-col">
         <form id="generator-form" class="card stack-lg">
           <div>
-            <label for="nodeLinks">1. 粘贴节点链接</label>
+            <label for="nodeLinks">1. Paste your original subscription link.</label>
             <textarea
               id="nodeLinks"
               name="nodeLinks"
               rows="10"
-              placeholder="支持 vmess://、vless://、trojan://，一行一个。也支持直接粘贴原始 base64 订阅内容。"
+              placeholder="Supports vmess://, vless://, trojan://, one per line. Also supports directly pasting raw base64 subscription content."
               required
             ></textarea>
-            <p class="hint">重点兼容自建 VMess / VLESS / Trojan 的 WS + TLS 常见写法。</p>
+            <p class="hint">Mainly compatible with common WS + TLS formats of self-hosted VMess / VLESS / Trojan nodes.</p>
           </div>
 
           <div>
-            <label for="preferredIps">2. 粘贴优选 IP / 优选域名</label>
+            <label for="preferredIps">2. Paste your preferred IPs / domains.</label>
             <textarea
               id="preferredIps"
               name="preferredIps"
               rows="8"
-              placeholder="示例：
+              placeholder="Example:
 104.16.1.2#HK-01
 104.17.2.3:2053#HK-02
 cf.example.com:443#US-Edge"
               required
             ></textarea>
             <p class="hint">
-              支持 <code>IP</code>、<code>IP:端口</code>、<code>域名</code>、<code>域名:端口</code>，<code>#</code> 后面可写备注。
+              Supports <code>IP</code>, <code>IP:port</code>, <code>domain</code>, <code>domain:port</code>, with optional comments after <code>#</code>.
             </p>
           </div>
 
           <div class="grid two-col compact">
             <div>
-              <label for="namePrefix">3. 备注前缀（可选）</label>
-              <input id="namePrefix" name="namePrefix" type="text" placeholder="例如 CF" />
+              <label for="namePrefix">3. Comment Prefix (Optional)</label>
+              <input id="namePrefix" name="namePrefix" type="text" placeholder="e.g., CF" />
             </div>
             <div class="checkbox-wrap">
               <input id="keepOriginalHost" name="keepOriginalHost" type="checkbox" checked />
-              <label for="keepOriginalHost">保留原节点 Host / SNI（推荐）</label>
+              <label for="keepOriginalHost">Keep Original Host / SNI (Recommended)</label>
             </div>
           </div>
 
           <div class="actions">
-            <button id="submitBtn" type="submit">生成订阅</button>
-            <button id="fillDemoBtn" type="button" class="secondary">填入演示数据</button>
+            <button id="submitBtn" type="submit">Generate Subscription</button>
+            <button id="fillDemoBtn" type="button" class="secondary">Fill Demo Data</button>
           </div>
         </form>
 
         <aside class="card stack-md tips">
-          <h2>说明</h2>
+          <h2>Notes</h2>
           <ul>
-            <li>不会帮你找优选 IP，只负责把你现成的优选 IP 替换进节点。</li>
-            <li>生成的链接是“同一份节点内容”的不同导出格式，分别给不同客户端使用。</li>
-            <li>推荐勾选“保留原 Host / SNI”，这样更适合 Cloudflare CDN 场景。</li>
-            <li>订阅链接里的节点信息会通过服务端密钥加密，请不要把链接公开分享。</li>
+            <li>This tool does not find preferred IPs for you — it only replaces existing nodes with the preferred IPs you provide.</li>
+            <li>The generated links contain the same node content in different export formats, each suited for different clients.</li>
+            <li>It's recommended to keep "Keep Original Host / SNI" enabled, especially for Cloudflare CDN scenarios.</li>
+            <li>Node information in subscription links is encrypted with a server-side key. Please do not share these links publicly.</li>
           </ul>
 
           <div class="client-box">
-            <h3>客户端怎么用</h3>
+            <h3>How to Use with Clients</h3>
             <ul>
-              <li><strong>V2rayN：</strong> 用原始订阅链接</li>
-              <li><strong>Shadowrocket：</strong> 用原始订阅链接</li>
-              <li><strong>Clash / Mihomo：</strong> 用 Clash 订阅链接</li>
-              <li><strong>Surge：</strong> 用 Surge 订阅链接</li>
+              <li><strong>V2rayN:</strong> Use the raw subscription link</li>
+              <li><strong>Shadowrocket:</strong> Use the raw subscription link</li>
+              <li><strong>Clash / Mihomo:</strong> Use the Clash subscription link</li>
+              <li><strong>Surge:</strong> Use the Surge subscription link</li>
             </ul>
           </div>
         </aside>
@@ -103,29 +103,29 @@ cf.example.com:443#US-Edge"
       <section id="resultSection" class="card stack-lg">
         <div class="section-head result-head">
           <div>
-            <p class="eyebrow">结果</p>
-            <h2>订阅结果</h2>
-            <p class="section-desc">选择适合你的客户端格式，复制订阅链接或扫码导入。</p>
+            <p class="eyebrow">Results</p>
+            <h2>Subscription Results</h2>
+            <p class="section-desc">Choose the format that matches your client, then copy the subscription link or scan the QR code to import.</p>
           </div>
         </div>
 
         <div id="warningBox" class="warning hidden"></div>
 
         <div id="emptyState" class="empty-state">
-          还没有生成订阅。请先填写节点链接和优选 IP，然后点击“生成订阅”。
+          No subscription generated yet. Please fill in the node links and preferred IPs, then click "Generate Subscription".
         </div>
 
         <div id="statsGrid" class="stats-grid">
           <div class="stat-card">
-            <span class="stat-label">原始节点</span>
+            <span class="stat-label">Original Nodes</span>
             <strong id="statInputNodes">0</strong>
           </div>
           <div class="stat-card">
-            <span class="stat-label">优选地址</span>
+            <span class="stat-label">Preferred Endpoints</span>
             <strong id="statEndpoints">0</strong>
           </div>
           <div class="stat-card">
-            <span class="stat-label">生成节点</span>
+            <span class="stat-label">Generated Nodes</span>
             <strong id="statOutputNodes">0</strong>
           </div>
         </div>
@@ -135,18 +135,18 @@ cf.example.com:443#US-Edge"
             <div class="sub-card-head">
               <div class="client-meta">
                 <div class="client-icon">
-                  <img src="/icons/auto.svg" alt="自动识别" />
+                  <img src="/icons/auto.svg" alt="Auto Detect" />
                 </div>
                 <div>
-                  <h3>自动识别</h3>
-                  <p>适合支持自动识别的客户端</p>
+                  <h3>Auto Detect</h3>
+                  <p>For clients that support automatic format detection</p>
                 </div>
               </div>
             </div>
             <div class="sub-actions">
               <input id="autoUrl" readonly />
-              <button data-copy-target="autoUrl" type="button" class="secondary small">复制</button>
-              <button data-qrcode-target="autoUrl" type="button" class="secondary small">二维码</button>
+              <button data-copy-target="autoUrl" type="button" class="secondary small">Copy</button>
+              <button data-qrcode-target="autoUrl" type="button" class="secondary small">QR Code</button>
             </div>
           </article>
 
@@ -158,14 +158,14 @@ cf.example.com:443#US-Edge"
                 </div>
                 <div>
                   <h3>V2rayN</h3>
-                  <p>适用于 V2rayN / v2rayNG</p>
+                  <p>For V2rayN / v2rayNG</p>
                 </div>
               </div>
             </div>
             <div class="sub-actions">
               <input id="rawUrl" readonly />
-              <button data-copy-target="rawUrl" type="button" class="secondary small">复制</button>
-              <button data-qrcode-target="rawUrl" type="button" class="secondary small">二维码</button>
+              <button data-copy-target="rawUrl" type="button" class="secondary small">Copy</button>
+              <button data-qrcode-target="rawUrl" type="button" class="secondary small">QR Code</button>
             </div>
           </article>
 
@@ -173,18 +173,18 @@ cf.example.com:443#US-Edge"
             <div class="sub-card-head">
               <div class="client-meta">
                 <div class="client-icon">
-                  <img src="/icons/clash.svg">
+                  <img src="/icons/clash.svg" alt="Clash">
                 </div>
                 <div>
                   <h3>Clash</h3>
-                  <p>适用于 Clash / Mihomo / Clash Verge</p>
+                  <p>For Clash / Mihomo / Clash Verge</p>
                 </div>
               </div>
             </div>
             <div class="sub-actions">
               <input id="clashUrl" readonly />
-              <button data-copy-target="clashUrl" type="button" class="secondary small">复制</button>
-              <button data-qrcode-target="clashUrl" type="button" class="secondary small">二维码</button>
+              <button data-copy-target="clashUrl" type="button" class="secondary small">Copy</button>
+              <button data-qrcode-target="clashUrl" type="button" class="secondary small">QR Code</button>
             </div>
           </article>
 
@@ -196,14 +196,14 @@ cf.example.com:443#US-Edge"
                 </div>
                 <div>
                   <h3>Shadowrocket</h3>
-                  <p>适用于 iPhone / iPad 小火箭</p>
+                  <p>For iPhone / iPad Shadowrocket</p>
                 </div>
               </div>
             </div>
             <div class="sub-actions">
               <input id="rocketUrl" readonly />
-              <button data-copy-target="rocketUrl" type="button" class="secondary small">复制</button>
-              <button data-qrcode-target="rocketUrl" type="button" class="secondary small">二维码</button>
+              <button data-copy-target="rocketUrl" type="button" class="secondary small">Copy</button>
+              <button data-qrcode-target="rocketUrl" type="button" class="secondary small">QR Code</button>
             </div>
           </article>
 
@@ -215,29 +215,29 @@ cf.example.com:443#US-Edge"
                 </div>
                 <div>
                   <h3>Surge</h3>
-                  <p>适用于 Surge Profile 导入</p>
+                  <p>For Surge Profile import</p>
                 </div>
               </div>
             </div>
             <div class="sub-actions">
               <input id="surgeUrl" readonly />
-              <button data-copy-target="surgeUrl" type="button" class="secondary small">复制</button>
-              <button data-qrcode-target="surgeUrl" type="button" class="secondary small">二维码</button>
+              <button data-copy-target="surgeUrl" type="button" class="secondary small">Copy</button>
+              <button data-qrcode-target="surgeUrl" type="button" class="secondary small">QR Code</button>
             </div>
-            <p class="hint">当前 Surge 导出以 VMess / Trojan 为主；你的示例 VMess 节点适用。</p>
+            <p class="hint">The current Surge export primarily supports VMess / Trojan; your sample VMess nodes are compatible.</p>
           </article>
         </div>
 
         <div class="preview-wrap">
-          <h3>预览前 20 个生成节点</h3>
+          <h3>Preview of First 20 Generated Nodes</h3>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>名称</th>
-                  <th>类型</th>
-                  <th>服务器</th>
-                  <th>端口</th>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Server</th>
+                  <th>Port</th>
                   <th>Host</th>
                   <th>SNI</th>
                 </tr>
@@ -254,10 +254,10 @@ cf.example.com:443#US-Edge"
       <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="qrTitle">
         <div class="modal-head">
           <div>
-            <p class="eyebrow">二维码导入</p>
-            <h3 id="qrTitle">订阅二维码</h3>
+            <p class="eyebrow">QR Code Import</p>
+            <h3 id="qrTitle">Subscription QR Code</h3>
           </div>
-          <button id="closeQrModal" type="button" class="secondary small">关闭</button>
+          <button id="closeQrModal" type="button" class="secondary small">Close</button>
         </div>
         <div class="modal-body">
           <div id="qrCanvas" class="qr-box"></div>
