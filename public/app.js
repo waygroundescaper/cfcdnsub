@@ -21,21 +21,21 @@ const demoVmess = [
 ].join('\n');
 
 const demoIps = [
-  '108.162.198.162#CN-Hangzhou-Telecom',
-  '162.159.45.98#CN-Hangzhou-Telecom',
-  '172.64.53.152#CN-Hangzhou-Telecom',
-  '104.20.26.90#CN-Hangzhou-Unicom',
-  '104.20.28.129#CN-Hangzhou-Unicom',
-  '104.20.16.179#CN-Hangzhou-Unicom',
-  '104.17.215.195#CN-Hangzhou-Mobile',
-  '104.17.218.30#CN-Hangzhou-Mobile',
-  '104.17.58.81#CN-Hangzhou-Mobile'
+  '108.162.198.162#电信',
+  '162.159.45.98#电信',
+  '172.64.53.152#电信',
+  '104.17.153.207#联通',
+  '104.17.145.159#联通',
+  '104.20.16.179#联通',
+  '104.26.8.81#移动',
+  '172.67.146.225#移动',
+  '104.17.58.81#移动'
 ].join('\n');
 
 fillDemoBtn.addEventListener('click', () => {
   document.getElementById('nodeLinks').value = demoVmess;
   document.getElementById('preferredIps').value = demoIps;
-  document.getElementById('namePrefix').value = 'CF';
+  document.getElementById('namePrefix').value = 'US';
   document.getElementById('keepOriginalHost').checked = true;
 });
 
