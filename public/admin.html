@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShadowEscaper Sub Admin</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter,Arial,sans-serif;
+  background:linear-gradient(135deg,#403a3e,#be5869);
+  color:white;
+  min-height:100vh;
+  padding:36px;
+}
+.card{
+  max-width:1200px;
+  margin:auto;
+  background:rgba(255,255,255,.14);
+  border:1px solid rgba(255,255,255,.25);
+  border-radius:24px;
+  padding:28px;
+  backdrop-filter:blur(18px);
+  box-shadow:0 20px 60px rgba(0,0,0,.25);
+}
+h1{margin-top:0}
+.row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:16px;
+}
+input{
+  padding:13px 14px;
+  border:0;
+  border-radius:12px;
+  min-width:260px;
+  outline:none;
+}
+button{
+  padding:13px 16px;
+  border:0;
+  border-radius:12px;
+  font-weight:800;
+  cursor:pointer;
+}
+.load{background:#93c5fd}
+.enable{background:#4ade80}
+.disable{background:#fb7185}
+.badge{
+  display:inline-block;
+  padding:7px 12px;
+  border-radius:999px;
+  font-weight:800;
+}
+.on{background:#22c55e}
+.off{background:#ef4444}
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:12px;
+  background:rgba(0,0,0,.14);
+  border-radius:14px;
+  overflow:hidden;
+}
+th,td{
+  padding:11px;
+  border-bottom:1px solid rgba(255,255,255,.16);
+  text-align:left;
+  font-size:14px;
+  vertical-align:top;
+}
+th{background:rgba(0,0,0,.22)}
+pre{
+  background:rgba(0,0,0,.25);
+  padding:14px;
+  border-radius:14px;
+  overflow:auto;
+  max-height:300px;
+}
+.small{opacity:.8;font-size:13px}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>ShadowEscaper Subscription Admin</h1>
+  <p class="small">Manage subscription download permission and view download logs.</p>
+
+  <div class="row">
+    <input id="apiBase" value="https://sub.crossthebluejail.top" placeholder="API Base">
+    <input id="adminToken" type="password" placeholder="ADMIN_TOKEN">
+    <input id="subId" placeholder="Subscription shortId">
+  </div>
+
+  <div class="row">
+    <button class="load" onclick="loadInfo()">Load Info</button>
+    <button class="enable" onclick="toggleDownload(true)">Allow Download</button>
+    <button class="disable" onclick="toggleDownload(false)">Disable Download</button>
+  </div>
+
+  <h2>Status</h2>
+  <div id="status">Not loaded.</div>
+
+  <h2>Nodes</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Server</th>
+        <th>Port</th>
+        <th>Host</th>
+        <th>SNI</th>
+      </tr>
+    </thead>
+    <tbody id="nodes"></tbody>
+  </table>
+
+  <h2>Download Logs</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>IP</th>
+        <th>Target</th>
+        <th>User Agent</th>
+      </tr>
+    </thead>
+    <tbody id="logs"></tbody>
+  </table>
+
+  <h2>Raw Response</h2>
+  <pre id="raw"></pre>
+</div>
+
+<script>
+function getConfig(){
+  return {
+    apiBase: document.getElementById("apiBase").value.replace(/\/$/, ""),
+    token: document.getElementById("adminToken").value.trim(),
+    id: document.getElementById("subId").value.trim()
+  };
+}
+
+function esc(s){
+  return String(s ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;");
+}
+
+async function loadInfo(){
+  const {apiBase, token, id} = getConfig();
+
+  if(!token || !id){
+    alert("Missing ADMIN_TOKEN or shortId");
+    return;
+  }
+
+  const res = await fetch(`${apiBase}/api/admin/sub/info?id=${encodeURIComponent(id)}`, {
+    method: "GET",
+    headers: {
+      "X-Admin-Token": token
+    }
+  });
+
+  const data = await res.json();
+  document.getElementById("raw").textContent = JSON.stringify(data, null, 2);
+
+  if(!data.ok){
+    document.getElementById("status").innerHTML =
+      `<span class="badge off">${esc(data.error || "Error")}</span>`;
+    return;
+  }
+
+  document.getElementById("status").innerHTML = data.downloadEnabled
+    ? `<span class="badge on">Download Enabled</span>`
+    : `<span class="badge off">Download Disabled</span>`;
+
+  document.getElementById("nodes").innerHTML = (data.nodes || []).map(n => `
+    <tr>
+      <td>${esc(n.name)}</td>
+      <td>${esc(n.type)}</td>
+      <td>${esc(n.server)}</td>
+      <td>${esc(n.port)}</td>
+      <td>${esc(n.host)}</td>
+      <td>${esc(n.sni)}</td>
+    </tr>
+  `).join("");
+
+  document.getElementById("logs").innerHTML = (data.logs || []).map(l => `
+    <tr>
+      <td>${esc(l.time)}</td>
+      <td>${esc(l.ip)}</td>
+      <td>${esc(l.target)}</td>
+      <td>${esc(l.userAgent)}</td>
+    </tr>
+  `).join("");
+}
+
+async function toggleDownload(enabled){
+  const {apiBase, token, id} = getConfig();
+
+  if(!token || !id){
+    alert("Missing ADMIN_TOKEN or shortId");
+    return;
+  }
+
+  const path = enabled
+    ? "/api/admin/sub/enable"
+    : "/api/admin/sub/disable";
+
+  const res = await fetch(apiBase + path, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Admin-Token": token
+    },
+    body: JSON.stringify({ id })
+  });
+
+  const data = await res.json();
+
+  if(!data.ok){
+    alert(data.error || "Failed");
+    return;
+  }
+
+  await loadInfo();
+}
+</script>
+
+</body>
+</html>
