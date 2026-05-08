@@ -3,137 +3,277 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ShadowEscaper Sub Admin</title>
+<title>ShadowEscaper Admin</title>
 <style>
+:root{
+  --bg1:#403a3e;
+  --bg2:#be5869;
+  --glass:rgba(255,255,255,.13);
+  --border:rgba(255,255,255,.22);
+  --text:#fff;
+  --muted:rgba(255,255,255,.72);
+  --green:#4ade80;
+  --red:#fb7185;
+  --blue:#93c5fd;
+  --yellow:#fde68a;
+}
 *{box-sizing:border-box}
 body{
   margin:0;
-  font-family:Inter,Arial,sans-serif;
-  background:linear-gradient(135deg,#403a3e,#be5869);
-  color:white;
   min-height:100vh;
-  padding:36px;
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 15% 20%,rgba(255,255,255,.16),transparent 28%),
+    radial-gradient(circle at 85% 10%,rgba(255,170,190,.18),transparent 30%),
+    linear-gradient(135deg,var(--bg1),var(--bg2));
+  padding:32px;
 }
+.container{max-width:1280px;margin:0 auto}
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:18px;
+  margin-bottom:22px;
+}
+.brand h1{margin:0;font-size:34px;letter-spacing:-.04em}
+.brand p{margin:8px 0 0;color:var(--muted)}
 .card{
-  max-width:1200px;
-  margin:auto;
-  background:rgba(255,255,255,.14);
-  border:1px solid rgba(255,255,255,.25);
-  border-radius:24px;
-  padding:28px;
-  backdrop-filter:blur(18px);
-  box-shadow:0 20px 60px rgba(0,0,0,.25);
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:28px;
+  padding:24px;
+  backdrop-filter:blur(22px);
+  box-shadow:0 24px 70px rgba(0,0,0,.28);
 }
-h1{margin-top:0}
-.row{
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+  margin-bottom:16px;
+}
+.stat{
+  background:rgba(255,255,255,.12);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:18px;
+}
+.stat .label{color:var(--muted);font-size:13px}
+.stat .value{font-size:24px;font-weight:900;margin-top:8px}
+.controls{
+  display:grid;
+  grid-template-columns:1.3fr 1fr 1fr;
+  gap:12px;
+  margin:18px 0;
+}
+input{
+  width:100%;
+  padding:14px 15px;
+  border:1px solid rgba(255,255,255,.22);
+  border-radius:16px;
+  outline:none;
+  color:white;
+  background:rgba(255,255,255,.12);
+}
+input::placeholder{color:rgba(255,255,255,.55)}
+.actions{
   display:flex;
   flex-wrap:wrap;
   gap:10px;
-  margin-bottom:16px;
-}
-input{
-  padding:13px 14px;
-  border:0;
-  border-radius:12px;
-  min-width:260px;
-  outline:none;
+  margin-bottom:22px;
 }
 button{
-  padding:13px 16px;
   border:0;
-  border-radius:12px;
-  font-weight:800;
+  border-radius:16px;
+  padding:13px 16px;
+  font-weight:900;
   cursor:pointer;
+  transition:.15s transform,.15s filter;
 }
-.load{background:#93c5fd}
-.enable{background:#4ade80}
-.disable{background:#fb7185}
+button:hover{transform:translateY(-1px);filter:brightness(1.05)}
+.load{background:var(--blue)}
+.enable{background:var(--green)}
+.disable{background:var(--red)}
+.global{background:var(--yellow)}
+.dark{background:rgba(255,255,255,.18);color:white;border:1px solid var(--border)}
+.section{
+  margin-top:20px;
+}
+.section-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:10px;
+}
+h2{margin:0;font-size:20px}
 .badge{
-  display:inline-block;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
   padding:7px 12px;
   border-radius:999px;
-  font-weight:800;
+  font-weight:900;
+  font-size:13px;
 }
-.on{background:#22c55e}
-.off{background:#ef4444}
+.on{background:rgba(34,197,94,.22);color:#bbf7d0;border:1px solid rgba(74,222,128,.5)}
+.off{background:rgba(239,68,68,.24);color:#fecdd3;border:1px solid rgba(251,113,133,.5)}
+.neutral{background:rgba(255,255,255,.14);color:white;border:1px solid var(--border)}
+.table-wrap{
+  overflow:auto;
+  border-radius:18px;
+  border:1px solid var(--border);
+  background:rgba(0,0,0,.13);
+}
 table{
   width:100%;
   border-collapse:collapse;
-  margin-top:12px;
-  background:rgba(0,0,0,.14);
-  border-radius:14px;
-  overflow:hidden;
+  min-width:760px;
 }
 th,td{
-  padding:11px;
-  border-bottom:1px solid rgba(255,255,255,.16);
+  padding:13px 14px;
+  border-bottom:1px solid rgba(255,255,255,.13);
   text-align:left;
-  font-size:14px;
   vertical-align:top;
+  font-size:14px;
 }
-th{background:rgba(0,0,0,.22)}
+th{
+  color:rgba(255,255,255,.82);
+  background:rgba(0,0,0,.23);
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+td{color:rgba(255,255,255,.92)}
 pre{
   background:rgba(0,0,0,.25);
-  padding:14px;
-  border-radius:14px;
+  border:1px solid var(--border);
+  padding:16px;
+  border-radius:18px;
   overflow:auto;
-  max-height:300px;
+  max-height:320px;
+  color:#f8fafc;
 }
-.small{opacity:.8;font-size:13px}
+.toast{
+  position:fixed;
+  right:24px;
+  bottom:24px;
+  background:rgba(20,20,25,.86);
+  border:1px solid rgba(255,255,255,.2);
+  color:white;
+  padding:14px 16px;
+  border-radius:16px;
+  backdrop-filter:blur(14px);
+  display:none;
+}
+.small{color:var(--muted);font-size:13px}
+@media(max-width:850px){
+  body{padding:18px}
+  .header{display:block}
+  .grid,.controls{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
 
-<div class="card">
-  <h1>ShadowEscaper Subscription Admin</h1>
-  <p class="small">Manage subscription download permission and view download logs.</p>
-
-  <div class="row">
-    <input id="apiBase" value="https://cfcdnsub.oleyyuissmart.workers.dev" placeholder="API Base">
-    <input id="adminToken" type="password" placeholder="ADMIN_TOKEN">
-    <input id="subId" placeholder="Subscription shortId">
+<div class="container">
+  <div class="header">
+    <div class="brand">
+      <h1>ShadowEscaper Admin</h1>
+      <p>Subscription permission, nodes, and download audit logs.</p>
+    </div>
+    <span id="globalStatus" class="badge neutral">Global: Unknown</span>
   </div>
 
-  <div class="row">
-    <button class="load" onclick="loadInfo()">Load Info</button>
-    <button class="enable" onclick="toggleDownload(true)">Allow Download</button>
-    <button class="disable" onclick="toggleDownload(false)">Disable Download</button>
+  <div class="grid">
+    <div class="stat">
+      <div class="label">Subscription Status</div>
+      <div id="subStatusText" class="value">Not Loaded</div>
+    </div>
+    <div class="stat">
+      <div class="label">Node Count</div>
+      <div id="nodeCount" class="value">0</div>
+    </div>
+    <div class="stat">
+      <div class="label">Download Logs</div>
+      <div id="logCount" class="value">0</div>
+    </div>
   </div>
 
-  <h2>Status</h2>
-  <div id="status">Not loaded.</div>
+  <div class="card">
+    <div class="controls">
+      <input id="apiBase" value="https://cfcdnsub.oleyyuissmart.workers.dev" placeholder="API Base">
+      <input id="adminToken" type="password" placeholder="ADMIN_TOKEN">
+      <input id="subId" placeholder="Subscription shortId">
+    </div>
 
-  <h2>Nodes</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Server</th>
-        <th>Port</th>
-        <th>Host</th>
-        <th>SNI</th>
-      </tr>
-    </thead>
-    <tbody id="nodes"></tbody>
-  </table>
+    <div class="actions">
+      <button class="load" onclick="loadInfo()">Load Info</button>
+      <button class="enable" onclick="toggleDownload(true)">Allow This Sub</button>
+      <button class="disable" onclick="toggleDownload(false)">Disable This Sub</button>
+      <button class="global" onclick="globalAllow()">Allow All 5 Min</button>
+      <button class="dark" onclick="checkGlobalStatus()">Check Global Status</button>
+    </div>
 
-  <h2>Download Logs</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Time</th>
-        <th>IP</th>
-        <th>Target</th>
-        <th>User Agent</th>
-      </tr>
-    </thead>
-    <tbody id="logs"></tbody>
-  </table>
+    <div class="section">
+      <div class="section-title">
+        <h2>Status</h2>
+        <div id="status"><span class="badge neutral">No subscription loaded</span></div>
+      </div>
+      <p id="meta" class="small"></p>
+    </div>
 
-  <h2>Raw Response</h2>
-  <pre id="raw"></pre>
+    <div class="section">
+      <div class="section-title">
+        <h2>Nodes</h2>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Server</th>
+              <th>Port</th>
+              <th>Host</th>
+              <th>SNI</th>
+            </tr>
+          </thead>
+          <tbody id="nodes"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">
+        <h2>Download Logs</h2>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>IP</th>
+              <th>Target</th>
+              <th>User Agent</th>
+            </tr>
+          </thead>
+          <tbody id="logs"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">
+        <h2>Raw Response</h2>
+      </div>
+      <pre id="raw"></pre>
+    </div>
+  </div>
 </div>
+
+<div id="toast" class="toast"></div>
 
 <script>
 function getConfig(){
@@ -152,6 +292,22 @@ function esc(s){
     .replaceAll('"',"&quot;");
 }
 
+function toast(msg){
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.style.display = "block";
+  setTimeout(() => el.style.display = "none", 2600);
+}
+
+async function readJson(res){
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error("Server returned non-JSON response: " + text.slice(0, 80));
+  }
+}
+
 async function loadInfo(){
   const {apiBase, token, id} = getConfig();
 
@@ -160,45 +316,57 @@ async function loadInfo(){
     return;
   }
 
-  const res = await fetch(`${apiBase}/api/admin/sub/info?id=${encodeURIComponent(id)}`, {
-    method: "GET",
-    headers: {
-      "X-Admin-Token": token
+  try{
+    const res = await fetch(`${apiBase}/api/admin/sub/info?id=${encodeURIComponent(id)}`, {
+      method: "GET",
+      headers: {"X-Admin-Token": token}
+    });
+
+    const data = await readJson(res);
+    document.getElementById("raw").textContent = JSON.stringify(data, null, 2);
+
+    if(!data.ok){
+      document.getElementById("status").innerHTML =
+        `<span class="badge off">${esc(data.error || "Error")}</span>`;
+      document.getElementById("subStatusText").textContent = "Error";
+      return;
     }
-  });
 
-  const data = await res.json();
-  document.getElementById("raw").textContent = JSON.stringify(data, null, 2);
+    document.getElementById("status").innerHTML = data.downloadEnabled
+      ? `<span class="badge on">Download Enabled</span>`
+      : `<span class="badge off">Download Disabled</span>`;
 
-  if(!data.ok){
-    document.getElementById("status").innerHTML =
-      `<span class="badge off">${esc(data.error || "Error")}</span>`;
-    return;
+    document.getElementById("subStatusText").textContent = data.downloadEnabled ? "Enabled" : "Disabled";
+    document.getElementById("nodeCount").textContent = data.nodeCount || 0;
+    document.getElementById("logCount").textContent = (data.logs || []).length;
+
+    document.getElementById("meta").textContent =
+      `ID: ${data.id} · Created: ${data.createdAt || "N/A"} · Updated: ${data.updatedAt || "N/A"}`;
+
+    document.getElementById("nodes").innerHTML = (data.nodes || []).map(n => `
+      <tr>
+        <td>${esc(n.name)}</td>
+        <td>${esc(n.type)}</td>
+        <td>${esc(n.server)}</td>
+        <td>${esc(n.port)}</td>
+        <td>${esc(n.host)}</td>
+        <td>${esc(n.sni)}</td>
+      </tr>
+    `).join("");
+
+    document.getElementById("logs").innerHTML = (data.logs || []).map(l => `
+      <tr>
+        <td>${esc(l.time)}</td>
+        <td>${esc(l.ip)}</td>
+        <td>${esc(l.target)}</td>
+        <td>${esc(l.userAgent)}</td>
+      </tr>
+    `).join("");
+
+    toast("Loaded subscription info.");
+  }catch(err){
+    alert(err.message);
   }
-
-  document.getElementById("status").innerHTML = data.downloadEnabled
-    ? `<span class="badge on">Download Enabled</span>`
-    : `<span class="badge off">Download Disabled</span>`;
-
-  document.getElementById("nodes").innerHTML = (data.nodes || []).map(n => `
-    <tr>
-      <td>${esc(n.name)}</td>
-      <td>${esc(n.type)}</td>
-      <td>${esc(n.server)}</td>
-      <td>${esc(n.port)}</td>
-      <td>${esc(n.host)}</td>
-      <td>${esc(n.sni)}</td>
-    </tr>
-  `).join("");
-
-  document.getElementById("logs").innerHTML = (data.logs || []).map(l => `
-    <tr>
-      <td>${esc(l.time)}</td>
-      <td>${esc(l.ip)}</td>
-      <td>${esc(l.target)}</td>
-      <td>${esc(l.userAgent)}</td>
-    </tr>
-  `).join("");
 }
 
 async function toggleDownload(enabled){
@@ -209,27 +377,88 @@ async function toggleDownload(enabled){
     return;
   }
 
-  const path = enabled
-    ? "/api/admin/sub/enable"
-    : "/api/admin/sub/disable";
+  const path = enabled ? "/api/admin/sub/enable" : "/api/admin/sub/disable";
 
-  const res = await fetch(apiBase + path, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Admin-Token": token
-    },
-    body: JSON.stringify({ id })
-  });
+  try{
+    const res = await fetch(apiBase + path, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Admin-Token": token
+      },
+      body: JSON.stringify({ id })
+    });
 
-  const data = await res.json();
+    const data = await readJson(res);
 
-  if(!data.ok){
-    alert(data.error || "Failed");
+    if(!data.ok){
+      alert(data.error || "Failed");
+      return;
+    }
+
+    toast(enabled ? "Subscription enabled." : "Subscription disabled.");
+    await loadInfo();
+  }catch(err){
+    alert(err.message);
+  }
+}
+
+async function globalAllow(){
+  const {apiBase, token} = getConfig();
+
+  if(!token){
+    alert("Missing ADMIN_TOKEN");
     return;
   }
 
-  await loadInfo();
+  try{
+    const res = await fetch(apiBase + "/api/admin/sub/global-allow", {
+      method: "POST",
+      headers: {"X-Admin-Token": token}
+    });
+
+    const data = await readJson(res);
+
+    if(!data.ok){
+      alert(data.error || "Failed");
+      return;
+    }
+
+    document.getElementById("globalStatus").className = "badge on";
+    document.getElementById("globalStatus").textContent = "Global: Allowed 5 Min";
+    toast("All subscriptions allowed for 5 minutes.");
+  }catch(err){
+    alert(err.message);
+  }
+}
+
+async function checkGlobalStatus(){
+  const {apiBase, token} = getConfig();
+
+  if(!token){
+    alert("Missing ADMIN_TOKEN");
+    return;
+  }
+
+  try{
+    const res = await fetch(apiBase + "/api/admin/sub/global-status", {
+      method: "GET",
+      headers: {"X-Admin-Token": token}
+    });
+
+    const data = await readJson(res);
+
+    if(!data.ok){
+      alert(data.error || "Failed");
+      return;
+    }
+
+    const el = document.getElementById("globalStatus");
+    el.className = data.globalAllow ? "badge on" : "badge off";
+    el.textContent = data.globalAllow ? "Global: Allowed" : "Global: Disabled";
+  }catch(err){
+    alert(err.message);
+  }
 }
 </script>
 
