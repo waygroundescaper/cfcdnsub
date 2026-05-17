@@ -735,6 +735,75 @@ async function handleAdminGlobalStatus(request, env) {
   });
 }
 
+// NEW: list all subscriptions, optionally filter by enabledOnly=true
+async function handleAdminSubList(request, env, url) {
+  if (!checkAdmin(request, env)) {
+    return json({ ok: false, error: "Forbidden" }, 403);
+  }
+
+  const enabledOnly = url.searchParams.get("enabledOnly") === "true";
+  const limit = Math.min(Number(url.searchParams.get("limit")) || 1000, 1000);
+
+  const subs = [];
+  let cursor = undefined;
+  let scanned = 0;
+  const maxKeys = 2000;
+
+  // Paginate through KV list — KV list() returns 1000 per page max.
+  while (scanned < maxKeys) {
+    const page = await env.SUB_STORE.list({
+      prefix: "sub:",
+      limit: 1000,
+      cursor
+    });
+
+    for (const item of page.keys) {
+      const id = item.name.slice("sub:".length);
+      const raw = await env.SUB_STORE.get(item.name);
+      if (!raw) continue;
+
+      let record;
+      try {
+        record = JSON.parse(raw);
+      } catch {
+        continue;
+      }
+
+      if (enabledOnly && record.downloadEnabled !== true) continue;
+
+      subs.push({
+        id,
+        downloadEnabled: record.downloadEnabled === true,
+        nodeCount: (record.nodes || []).length,
+        createdAt: record.createdAt || null,
+        updatedAt: record.updatedAt || null
+      });
+
+      if (subs.length >= limit) break;
+    }
+
+    scanned += page.keys.length;
+
+    if (subs.length >= limit) break;
+    if (page.list_complete || !page.cursor) break;
+    cursor = page.cursor;
+  }
+
+  // Sort newest-updated first
+  subs.sort((a, b) => {
+    const ta = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+    const tb = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+    return tb - ta;
+  });
+
+  return json({
+    ok: true,
+    enabledOnly,
+    count: subs.length,
+    subs
+  });
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -750,7 +819,7 @@ export default {
       return json({
         ok: true,
         service: "ShadowEscaper Sub Worker",
-        version: "admin-sub-v2"
+        version: "admin-sub-v3"
       });
     }
 
@@ -768,6 +837,10 @@ export default {
 
     if (request.method === "GET" && url.pathname === "/api/admin/sub/info") {
       return handleAdminSubInfo(request, env, url);
+    }
+
+    if (request.method === "GET" && url.pathname === "/api/admin/sub/list") {
+      return handleAdminSubList(request, env, url);
     }
 
     if (request.method === "POST" && url.pathname === "/api/admin/sub/global-allow") {

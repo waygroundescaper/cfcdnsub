@@ -16,6 +16,7 @@
   --red:#fb7185;
   --blue:#93c5fd;
   --yellow:#fde68a;
+  --purple:#c4b5fd;
 }
 *{box-sizing:border-box}
 body{
@@ -63,7 +64,7 @@ body{
 .stat .value{font-size:24px;font-weight:900;margin-top:8px}
 .controls{
   display:grid;
-  grid-template-columns:1.3fr 1fr 1fr;
+  grid-template-columns:1.3fr 1fr;
   gap:12px;
   margin:18px 0;
 }
@@ -96,10 +97,9 @@ button:hover{transform:translateY(-1px);filter:brightness(1.05)}
 .enable{background:var(--green)}
 .disable{background:var(--red)}
 .global{background:var(--yellow)}
+.list-btn{background:var(--purple)}
 .dark{background:rgba(255,255,255,.18);color:white;border:1px solid var(--border)}
-.section{
-  margin-top:20px;
-}
+.section{margin-top:20px}
 .section-title{
   display:flex;
   align-items:center;
@@ -146,6 +146,14 @@ th{
   letter-spacing:.06em;
 }
 td{color:rgba(255,255,255,.92)}
+td .link-btn{
+  background:rgba(255,255,255,.18);
+  color:white;
+  padding:6px 10px;
+  border-radius:10px;
+  font-size:12px;
+  font-weight:700;
+}
 pre{
   background:rgba(0,0,0,.25);
   border:1px solid var(--border);
@@ -168,6 +176,46 @@ pre{
   display:none;
 }
 .small{color:var(--muted);font-size:13px}
+
+/* lock screen */
+.lock-overlay{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:
+    radial-gradient(circle at 30% 30%,rgba(255,255,255,.14),transparent 30%),
+    linear-gradient(135deg,var(--bg1),var(--bg2));
+  z-index:10000;
+  padding:20px;
+}
+.lock-card{
+  width:100%;
+  max-width:420px;
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:26px;
+  padding:30px;
+  backdrop-filter:blur(22px);
+  box-shadow:0 30px 80px rgba(0,0,0,.35);
+}
+.lock-card h2{font-size:24px;margin:0 0 6px;letter-spacing:-.02em}
+.lock-card p{margin:0 0 18px;color:var(--muted);font-size:14px}
+.lock-card input{margin-bottom:12px}
+.lock-card button{
+  width:100%;
+  background:var(--blue);
+  color:#0b1a33;
+}
+.lock-error{
+  color:#fecdd3;
+  font-size:13px;
+  min-height:18px;
+  margin-bottom:8px;
+}
+.app{display:none}
+
 @media(max-width:850px){
   body{padding:18px}
   .header{display:block}
@@ -177,13 +225,29 @@ pre{
 </head>
 <body>
 
-<div class="container">
+<!-- Lock Screen -->
+<div id="lockOverlay" class="lock-overlay">
+  <div class="lock-card">
+    <h2>🔒 Admin Access</h2>
+    <p>Enter token password to continue.</p>
+    <input id="lockApiBase" type="hidden" value="https://cfcdnsub.oleyyuissmart.workers.dev">
+    <input id="lockToken" type="password" placeholder="Enter Token Password" autocomplete="current-password">
+    <div id="lockError" class="lock-error"></div>
+    <button id="lockBtn" onclick="tryUnlock()">Unlock</button>
+  </div>
+</div>
+
+<!-- Main App -->
+<div id="app" class="app container">
   <div class="header">
     <div class="brand">
       <h1>ShadowEscaper Admin</h1>
       <p>Subscription permission, nodes, and download audit logs.</p>
     </div>
-    <span id="globalStatus" class="badge neutral">Global: Unknown</span>
+    <div style="display:flex;gap:10px;align-items:center">
+      <span id="globalStatus" class="badge neutral">Global: Unknown</span>
+      <button class="dark" onclick="logout()" style="padding:8px 12px;font-size:13px">Lock</button>
+    </div>
   </div>
 
   <div class="grid">
@@ -204,7 +268,6 @@ pre{
   <div class="card">
     <div class="controls">
       <input id="apiBase" value="https://cfcdnsub.oleyyuissmart.workers.dev" placeholder="API Base">
-      <input id="adminToken" type="password" placeholder="ADMIN_TOKEN">
       <input id="subId" placeholder="Subscription shortId">
     </div>
 
@@ -214,6 +277,7 @@ pre{
       <button class="disable" onclick="toggleDownload(false)">Disable This Sub</button>
       <button class="global" onclick="globalAllow()">Allow All 5 Min</button>
       <button class="dark" onclick="checkGlobalStatus()">Check Global Status</button>
+      <button class="list-btn" onclick="listEnabledSubs()">View All Enabled Subs</button>
     </div>
 
     <div class="section">
@@ -222,6 +286,28 @@ pre{
         <div id="status"><span class="badge neutral">No subscription loaded</span></div>
       </div>
       <p id="meta" class="small"></p>
+    </div>
+
+    <!-- Enabled Subs List -->
+    <div class="section" id="enabledSection" style="display:none">
+      <div class="section-title">
+        <h2>Enabled Subscriptions</h2>
+        <span id="enabledCount" class="badge neutral">0</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Short ID</th>
+              <th>Nodes</th>
+              <th>Created</th>
+              <th>Updated</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="enabledList"></tbody>
+        </table>
+      </div>
     </div>
 
     <div class="section">
@@ -276,13 +362,8 @@ pre{
 <div id="toast" class="toast"></div>
 
 <script>
-function getConfig(){
-  return {
-    apiBase: document.getElementById("apiBase").value.replace(/\/$/, ""),
-    token: document.getElementById("adminToken").value.trim(),
-    id: document.getElementById("subId").value.trim()
-  };
-}
+const SS_TOKEN = "se_admin_token";
+const SS_BASE = "se_admin_base";
 
 function esc(s){
   return String(s ?? "")
@@ -308,11 +389,96 @@ async function readJson(res){
   }
 }
 
+function getConfig(){
+  return {
+    apiBase: (sessionStorage.getItem(SS_BASE) || document.getElementById("apiBase").value).replace(/\/$/, ""),
+    token: sessionStorage.getItem(SS_TOKEN) || "",
+    id: document.getElementById("subId").value.trim()
+  };
+}
+
+// ===== Lock Screen =====
+async function tryUnlock(){
+  const base = document.getElementById("lockApiBase").value.replace(/\/$/, "").trim();
+  const token = document.getElementById("lockToken").value.trim();
+  const err = document.getElementById("lockError");
+  const btn = document.getElementById("lockBtn");
+
+  err.textContent = "";
+
+  if(!base || !token){
+    err.textContent = "API Base and token are required.";
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Verifying...";
+
+  try{
+    // global-status requires admin token, so this is a clean way to validate
+    const res = await fetch(base + "/api/admin/sub/global-status", {
+      method: "GET",
+      headers: {"X-Admin-Token": token}
+    });
+
+    const data = await readJson(res);
+
+    if(res.status === 403 || !data.ok){
+      err.textContent = "Incorrect token.";
+      return;
+    }
+
+    // Success
+    sessionStorage.setItem(SS_TOKEN, token);
+    sessionStorage.setItem(SS_BASE, base);
+
+    document.getElementById("apiBase").value = base;
+    document.getElementById("lockOverlay").style.display = "none";
+    document.getElementById("app").style.display = "block";
+
+    // Reflect global status immediately
+    const gs = document.getElementById("globalStatus");
+    gs.className = data.globalAllow ? "badge on" : "badge off";
+    gs.textContent = data.globalAllow ? "Global: Allowed" : "Global: Disabled";
+  }catch(e){
+    err.textContent = e.message || "Verification failed.";
+  }finally{
+    btn.disabled = false;
+    btn.textContent = "Unlock";
+  }
+}
+
+function logout(){
+  sessionStorage.removeItem(SS_TOKEN);
+  sessionStorage.removeItem(SS_BASE);
+  location.reload();
+}
+
+// Auto-unlock if token already in session
+function tryAutoUnlock(){
+  const token = sessionStorage.getItem(SS_TOKEN);
+  const base = sessionStorage.getItem(SS_BASE);
+  if(token && base){
+    document.getElementById("lockToken").value = token;
+    document.getElementById("lockApiBase").value = base;
+    tryUnlock();
+  }
+}
+
+// Enter key on lock
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("lockToken").addEventListener("keydown", e => {
+    if(e.key === "Enter") tryUnlock();
+  });
+  tryAutoUnlock();
+});
+
+// ===== Existing actions =====
 async function loadInfo(){
   const {apiBase, token, id} = getConfig();
 
   if(!token || !id){
-    alert("Missing ADMIN_TOKEN or shortId");
+    alert("Missing token or shortId");
     return;
   }
 
@@ -373,7 +539,7 @@ async function toggleDownload(enabled){
   const {apiBase, token, id} = getConfig();
 
   if(!token || !id){
-    alert("Missing ADMIN_TOKEN or shortId");
+    alert("Missing token or shortId");
     return;
   }
 
@@ -405,60 +571,80 @@ async function toggleDownload(enabled){
 
 async function globalAllow(){
   const {apiBase, token} = getConfig();
-
-  if(!token){
-    alert("Missing ADMIN_TOKEN");
-    return;
-  }
+  if(!token){ alert("Missing token"); return; }
 
   try{
     const res = await fetch(apiBase + "/api/admin/sub/global-allow", {
       method: "POST",
       headers: {"X-Admin-Token": token}
     });
-
     const data = await readJson(res);
-
-    if(!data.ok){
-      alert(data.error || "Failed");
-      return;
-    }
+    if(!data.ok){ alert(data.error || "Failed"); return; }
 
     document.getElementById("globalStatus").className = "badge on";
     document.getElementById("globalStatus").textContent = "Global: Allowed 5 Min";
     toast("All subscriptions allowed for 5 minutes.");
-  }catch(err){
-    alert(err.message);
-  }
+  }catch(err){ alert(err.message); }
 }
 
 async function checkGlobalStatus(){
   const {apiBase, token} = getConfig();
-
-  if(!token){
-    alert("Missing ADMIN_TOKEN");
-    return;
-  }
+  if(!token){ alert("Missing token"); return; }
 
   try{
     const res = await fetch(apiBase + "/api/admin/sub/global-status", {
       method: "GET",
       headers: {"X-Admin-Token": token}
     });
-
     const data = await readJson(res);
-
-    if(!data.ok){
-      alert(data.error || "Failed");
-      return;
-    }
+    if(!data.ok){ alert(data.error || "Failed"); return; }
 
     const el = document.getElementById("globalStatus");
     el.className = data.globalAllow ? "badge on" : "badge off";
     el.textContent = data.globalAllow ? "Global: Allowed" : "Global: Disabled";
-  }catch(err){
-    alert(err.message);
-  }
+  }catch(err){ alert(err.message); }
+}
+
+// ===== NEW: List all enabled subscriptions =====
+async function listEnabledSubs(){
+  const {apiBase, token} = getConfig();
+  if(!token){ alert("Missing token"); return; }
+
+  try{
+    const res = await fetch(apiBase + "/api/admin/sub/list?enabledOnly=true", {
+      method: "GET",
+      headers: {"X-Admin-Token": token}
+    });
+    const data = await readJson(res);
+    if(!data.ok){ alert(data.error || "Failed"); return; }
+
+    const subs = data.subs || [];
+    document.getElementById("enabledSection").style.display = "block";
+    document.getElementById("enabledCount").textContent = `${subs.length} enabled`;
+    document.getElementById("enabledCount").className = "badge " + (subs.length ? "on" : "neutral");
+
+    document.getElementById("enabledList").innerHTML = subs.length
+      ? subs.map(s => `
+        <tr>
+          <td><code>${esc(s.id)}</code></td>
+          <td>${esc(s.nodeCount)}</td>
+          <td>${esc(s.createdAt || "—")}</td>
+          <td>${esc(s.updatedAt || "—")}</td>
+          <td>
+            <button class="link-btn" onclick="pickSub('${esc(s.id)}')">Inspect</button>
+          </td>
+        </tr>
+      `).join("")
+      : `<tr><td colspan="5" style="text-align:center;color:var(--muted)">No enabled subscriptions.</td></tr>`;
+
+    toast(`Found ${subs.length} enabled subscription(s).`);
+  }catch(err){ alert(err.message); }
+}
+
+function pickSub(id){
+  document.getElementById("subId").value = id;
+  loadInfo();
+  window.scrollTo({top:0, behavior:"smooth"});
 }
 </script>
 
